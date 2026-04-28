@@ -1,0 +1,395 @@
+{
+  "name": "chatwoot-testen8n",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "90574ce5-b3b2-4552-bb54-0f61157df421",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        96
+      ],
+      "id": "9a8b7f13-eda4-4978-9d69-811efd023a21",
+      "name": "Webhook",
+      "webhookId": "90574ce5-b3b2-4552-bb54-0f61157df421"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.syncstore.com.br/api/v1/accounts/{{ $('data_set').item.json.account_id }}/conversations/{{ $('data_set').item.json.conversation_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "n789ZARtj7mj5c82K1WBFeim"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\":{{ JSON.stringify($json.output) }}\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -32,
+        96
+      ],
+      "id": "063bda7c-c623-4461-b497-07c1d8ef6676",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensagem }}",
+        "options": {
+          "systemMessage": "=#VOCE É UM ASSISTENTE CONVERSACIONAL QUE INTERAGE E CONVERSA COM O USUARIO.\n-> Nome do usuario: `{{ $json.user_name }}`\n-> Seu derver é sempre responder a mensagem `{{ $json.mensagem }}` com uma saida correspondente."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -384,
+        80
+      ],
+      "id": "cc448558-e150-4cad-91c5-7d1cc79c47b2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "=llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        320
+      ],
+      "id": "318eef48-dc60-41ea-b2dc-03d9fb8b41f4",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "pvX4jXHG6znnYR10",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c2e4eb2-69f9-4aea-abc7-9a977f0aeecb",
+              "name": "user_name",
+              "value": "={{ $json.body.meta.sender.name }}",
+              "type": "string"
+            },
+            {
+              "id": "ef0bed4e-5873-46bb-9eae-30e52a2c6ca2",
+              "name": "mensagem",
+              "value": "={{ $json.body.messages[0].content }}",
+              "type": "string"
+            },
+            {
+              "id": "15f92634-7473-4811-ae77-a1ebae605e02",
+              "name": "account_id",
+              "value": "={{ $json.body.messages[0].account_id }}",
+              "type": "number"
+            },
+            {
+              "id": "4d9d6513-f15e-42c0-81b9-d8541dcecb6f",
+              "name": "contact",
+              "value": "={{ $json.body.messages[0].sender.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "e319cf23-45de-48c8-8449-3060df74205a",
+              "name": "conversation_id",
+              "value": "={{ $json.body.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -608,
+        96
+      ],
+      "id": "f59ddc1f-a2d4-4ab7-8a9a-13e70b5aae7c",
+      "name": "data_set"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        320
+      ],
+      "id": "0c9906bc-057b-47cb-a0fd-7a64fa2180d2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "Mensagem Recebida",
+        "height": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -992,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "d003a3b8-0c34-46fc-9f69-56c697cc5618",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Ajuste de Dados",
+        "height": 192,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -688,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "fce41236-192b-40ba-a586-05be03c2c36a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Agente de resposta IA",
+        "height": 448,
+        "width": 272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "af8e21a6-695f-4e29-8632-96e6522eb57c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Mensagem Eviada",
+        "height": 192,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "0c9ab0c7-525d-462c-b9b5-ad7e3e4cf705",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "connection": "upgrade",
+            "host": "syncstore.com.br",
+            "x-real-ip": "172.18.0.5",
+            "x-forwarded-for": "172.18.0.5",
+            "x-forwarded-proto": "https",
+            "content-length": "1812",
+            "accept": "application/json",
+            "user-agent": "rest-client/2.1.0 (linux-musl x86_64) ruby/3.4.4p34",
+            "content-type": "application/json",
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "additional_attributes": {},
+            "can_reply": true,
+            "channel": "Channel::Whatsapp",
+            "contact_inbox": {
+              "id": 1,
+              "contact_id": 1,
+              "inbox_id": 2,
+              "source_id": "553898501077",
+              "created_at": "2026-03-05T16:54:00.003Z",
+              "updated_at": "2026-03-05T16:54:00.003Z",
+              "hmac_verified": false,
+              "pubsub_token": "QfKTwrn1oZpnqoo6qvYaGK8E"
+            },
+            "id": 8,
+            "inbox_id": 2,
+            "messages": [
+              {
+                "id": 127,
+                "content": "como fritar um ovo",
+                "account_id": 2,
+                "inbox_id": 2,
+                "conversation_id": 8,
+                "message_type": 0,
+                "created_at": 1773339912,
+                "updated_at": "2026-03-12T18:25:12.715Z",
+                "private": false,
+                "status": "sent",
+                "source_id": "wamid.HBgMNTUzODk4NTAxMDc3FQIAEhgUM0I5NUJCRTg5QjUwOEY1OUJEMDcA",
+                "content_type": "text",
+                "content_attributes": {},
+                "sender_type": "Contact",
+                "sender_id": 1,
+                "external_source_ids": {},
+                "additional_attributes": {},
+                "processed_message_content": "como fritar um ovo",
+                "sentiment": {},
+                "conversation": {
+                  "assignee_id": null,
+                  "unread_count": 1,
+                  "last_activity_at": 1773339912,
+                  "contact_inbox": {
+                    "source_id": "553898501077"
+                  }
+                },
+                "sender": {
+                  "additional_attributes": {},
+                  "custom_attributes": {},
+                  "email": null,
+                  "id": 1,
+                  "identifier": null,
+                  "name": "Rafa Marques",
+                  "phone_number": "+553898501077",
+                  "thumbnail": "",
+                  "blocked": false,
+                  "type": "contact"
+                }
+              }
+            ],
+            "labels": [],
+            "meta": {
+              "sender": {
+                "additional_attributes": {},
+                "custom_attributes": {},
+                "email": null,
+                "id": 1,
+                "identifier": null,
+                "name": "Rafa Marques",
+                "phone_number": "+553898501077",
+                "thumbnail": "",
+                "blocked": false,
+                "type": "contact"
+              },
+              "assignee": null,
+              "assignee_type": null,
+              "team": null,
+              "hmac_verified": false
+            },
+            "status": "open",
+            "custom_attributes": {},
+            "snoozed_until": null,
+            "unread_count": 1,
+            "first_reply_created_at": "2026-03-12T18:25:03.718Z",
+            "priority": null,
+            "waiting_since": 1773339912,
+            "agent_last_seen_at": 1773339905,
+            "contact_last_seen_at": 0,
+            "last_activity_at": 1773339912,
+            "timestamp": 1773339912,
+            "created_at": 1773339903,
+            "updated_at": 1773339912.756562,
+            "event": "automation_event.message_created"
+          },
+          "webhookUrl": "https://syncstore.com.br/webhook/90574ce5-b3b2-4552-bb54-0f61157df421",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "data_set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data_set": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "76587dd8-2f6d-4861-8fcc-50b81af22a4b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8661305cc9870ba148a6872b6951f39f768396a7a618194989e846e69bd65236"
+  },
+  "id": "KIsYFlDvNxod3AqR",
+  "tags": []
+}
